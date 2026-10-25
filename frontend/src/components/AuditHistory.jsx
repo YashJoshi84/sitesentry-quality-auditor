@@ -75,7 +75,7 @@ export default function AuditHistory({ onOpenReport, onReAudit, onNewAudit }) {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-app-border">
         <div>
           <h1 className="text-xl sm:text-2xl font-medium text-text-primary tracking-tight flex items-center gap-2">
-            <History className="w-5 h-5 text-accent" />
+            <History className="w-5 h-5 text-text-primary" />
             Audit History
           </h1>
           <p className="text-xs text-text-secondary mt-0.5">
@@ -85,7 +85,7 @@ export default function AuditHistory({ onOpenReport, onReAudit, onNewAudit }) {
 
         <button
           onClick={onNewAudit}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-accent hover:bg-accent-hover text-white text-xs font-medium transition-colors shadow-subtle"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#E6E8E6] hover:bg-white text-[#17191B] text-xs font-medium transition-colors shadow-subtle"
         >
           <Plus className="w-3.5 h-3.5" />
           <span>New Audit</span>
@@ -102,7 +102,7 @@ export default function AuditHistory({ onOpenReport, onReAudit, onNewAudit }) {
             placeholder="Filter by domain or URL..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-app-surface border border-app-border rounded-md pl-8 pr-3 py-1.5 text-xs text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent transition-colors font-mono"
+            className="w-full bg-app-surface border border-app-border rounded-md pl-8 pr-3 py-1.5 text-xs text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-text-primary transition-colors font-mono"
           />
         </div>
 
@@ -124,13 +124,13 @@ export default function AuditHistory({ onOpenReport, onReAudit, onNewAudit }) {
       {/* History Grid / List */}
       {loading ? (
         <div className="p-12 text-center rounded-lg surface-card">
-          <Loader2 className="w-6 h-6 animate-spin text-accent mx-auto mb-2" />
+          <Loader2 className="w-6 h-6 animate-spin text-text-primary mx-auto mb-2" />
           <p className="text-xs text-text-secondary">Loading history...</p>
         </div>
       ) : audits.length === 0 ? (
         <div className="p-12 text-center rounded-lg surface-card space-y-3">
           <div className="w-9 h-9 rounded-md bg-app-raised border border-app-border text-text-tertiary flex items-center justify-center mx-auto">
-            <ShieldCheck className="w-5 h-5 text-accent" />
+            <ShieldCheck className="w-5 h-5 text-text-primary" />
           </div>
           <div>
             <h3 className="text-xs font-medium text-text-primary">No Audits Found</h3>
@@ -142,7 +142,7 @@ export default function AuditHistory({ onOpenReport, onReAudit, onNewAudit }) {
           </div>
           <button
             onClick={onNewAudit}
-            className="px-3 py-1.5 rounded-md bg-accent hover:bg-accent-hover text-white text-xs font-medium transition-colors"
+            className="px-3 py-1.5 rounded-md bg-[#E6E8E6] hover:bg-white text-[#17191B] text-xs font-medium transition-colors"
           >
             Start First Audit
           </button>
@@ -155,10 +155,9 @@ export default function AuditHistory({ onOpenReport, onReAudit, onNewAudit }) {
 
             const scoreColors = {
               emerald: 'text-status-success border-status-success-border bg-status-success-bg',
-              indigo: 'text-accent border-accent-border bg-accent-muted',
               amber: 'text-status-warning border-status-warning-border bg-status-warning-bg',
               rose: 'text-status-error border-status-error-border bg-status-error-bg',
-            }[color] || 'text-text-tertiary';
+            }[color] || 'text-status-success border-status-success-border bg-status-success-bg';
 
             const isConfirmingDelete = deleteConfirmId === audit._id;
 
@@ -171,7 +170,7 @@ export default function AuditHistory({ onOpenReport, onReAudit, onNewAudit }) {
                 {/* Left: Domain, URL, Date */}
                 <div className="min-w-0 flex-1 space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-text-primary text-xs tracking-tight group-hover:text-accent transition-colors truncate">
+                    <span className="font-medium text-text-primary text-xs tracking-tight group-hover:text-white transition-colors truncate">
                       {audit.domain}
                     </span>
                     <span className="text-[10px] text-text-tertiary font-mono">

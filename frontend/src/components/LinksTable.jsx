@@ -131,7 +131,7 @@ export default function LinksTable({ checkedLinks = [] }) {
                     href={link.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-text-primary hover:text-accent hover:underline flex items-center gap-1.5 truncate"
+                    className="text-text-primary hover:text-white hover:underline flex items-center gap-1.5 truncate"
                   >
                     <span className="truncate">{link.url}</span>
                     <ExternalLink className="w-3 h-3 flex-shrink-0 text-text-tertiary" />

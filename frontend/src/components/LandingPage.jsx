@@ -58,7 +58,7 @@ export default function LandingPage({ onStartAudit, loading }) {
 
         {/* URL Input Form (Focal Point) */}
         <form onSubmit={handleSubmit} className="pt-3">
-          <div className="relative flex flex-col sm:flex-row items-stretch sm:items-center rounded-lg bg-app-surface border border-app-border p-1.5 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent transition-all shadow-subtle">
+          <div className="relative flex flex-col sm:flex-row items-stretch sm:items-center rounded-lg bg-app-surface border border-app-border p-1.5 focus-within:border-text-primary focus-within:ring-1 focus-within:ring-[#484E50] transition-all shadow-subtle">
             <div className="relative flex-1 flex items-center pl-2.5">
               <Globe className="w-4 h-4 text-text-tertiary flex-shrink-0" />
               <input
@@ -77,7 +77,7 @@ export default function LandingPage({ onStartAudit, loading }) {
             <button
               type="submit"
               disabled={loading}
-              className="mt-2 sm:mt-0 flex items-center justify-center gap-1.5 px-4 py-2 rounded-md bg-accent hover:bg-accent-hover text-white text-xs font-medium transition-colors disabled:opacity-50 flex-shrink-0 shadow-subtle"
+              className="mt-2 sm:mt-0 flex items-center justify-center gap-1.5 px-4 py-2 rounded-md bg-[#E6E8E6] hover:bg-white text-[#17191B] text-xs font-medium transition-colors disabled:opacity-40 flex-shrink-0 shadow-subtle"
             >
               <span>{loading ? 'Starting scan...' : 'Run Audit'}</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -123,7 +123,7 @@ export default function LandingPage({ onStartAudit, loading }) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* SEO & Metadata */}
           <div className="surface-card p-5 space-y-3">
-            <div className="w-8 h-8 rounded-md bg-app-raised border border-app-border flex items-center justify-center text-accent">
+            <div className="w-8 h-8 rounded-md bg-app-raised border border-app-border flex items-center justify-center text-text-primary">
               <Search className="w-4 h-4" />
             </div>
             <div>
@@ -150,7 +150,7 @@ export default function LandingPage({ onStartAudit, loading }) {
 
           {/* axe-core Accessibility */}
           <div className="surface-card p-5 space-y-3">
-            <div className="w-8 h-8 rounded-md bg-app-raised border border-app-border flex items-center justify-center text-accent">
+            <div className="w-8 h-8 rounded-md bg-app-raised border border-app-border flex items-center justify-center text-text-primary">
               <Accessibility className="w-4 h-4" />
             </div>
             <div>
@@ -177,7 +177,7 @@ export default function LandingPage({ onStartAudit, loading }) {
 
           {/* Broken Links */}
           <div className="surface-card p-5 space-y-3">
-            <div className="w-8 h-8 rounded-md bg-app-raised border border-app-border flex items-center justify-center text-accent">
+            <div className="w-8 h-8 rounded-md bg-app-raised border border-app-border flex items-center justify-center text-text-primary">
               <Link2 className="w-4 h-4" />
             </div>
             <div>
@@ -204,7 +204,7 @@ export default function LandingPage({ onStartAudit, loading }) {
 
           {/* Mobile Readiness */}
           <div className="surface-card p-5 space-y-3">
-            <div className="w-8 h-8 rounded-md bg-app-raised border border-app-border flex items-center justify-center text-accent">
+            <div className="w-8 h-8 rounded-md bg-app-raised border border-app-border flex items-center justify-center text-text-primary">
               <Smartphone className="w-4 h-4" />
             </div>
             <div>
@@ -235,7 +235,7 @@ export default function LandingPage({ onStartAudit, loading }) {
       <section className="surface-card p-6 border border-app-border space-y-4">
         <div className="flex items-center justify-between border-b border-app-border pb-3">
           <div className="flex items-center gap-2">
-            <Cpu className="w-4 h-4 text-accent" />
+            <Cpu className="w-4 h-4 text-text-primary" />
             <h3 className="text-xs font-semibold uppercase tracking-wider text-text-secondary font-mono">
               Architecture & Data Flow
             </h3>

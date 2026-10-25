@@ -1,109 +1,96 @@
 import React, { useEffect, useState } from 'react';
-import {
-  ShieldCheck,
-  Search,
-  Globe,
-  Accessibility,
-  Link2,
-  Smartphone,
-  CheckCircle2,
-  Loader2,
-  Terminal,
-  AlertCircle,
-  ArrowLeft,
-} from 'lucide-react';
-import { fetchAuditById, getProgressEventSourceUrl } from '../services/api';
+import { Loader2, CheckCircle2, AlertCircle, ArrowLeft, Terminal, Search, Accessibility, Link2, Smartphone } from 'lucide-react';
+import { getProgressEventSourceUrl } from '../services/api';
 
 const STAGES = [
-  { id: 'validating', label: 'URL Validation', icon: Globe },
-  { id: 'fetching_html', label: 'DOM Extraction', icon: Search },
-  { id: 'seo_audit', label: 'SEO Audit', icon: ShieldCheck },
-  { id: 'a11y_audit', label: 'Axe Accessibility', icon: Accessibility },
-  { id: 'link_audit', label: 'Hyperlinks Check', icon: Link2 },
-  { id: 'mobile_audit', label: 'Mobile Viewport', icon: Smartphone },
-  { id: 'finalizing', label: 'Scoring', icon: CheckCircle2 },
+  { id: 'fetch', label: 'Page Fetch & Render', icon: Search },
+  { id: 'seo', label: 'SEO & Metadata', icon: Search },
+  { id: 'a11y', label: 'axe-core Accessibility', icon: Accessibility },
+  { id: 'links', label: 'Hyperlinks Check', icon: Link2 },
+  { id: 'mobile', label: 'Mobile Readiness', icon: Smartphone },
+  { id: 'scoring', label: 'Score Aggregation', icon: CheckCircle2 },
 ];
 
 export default function AuditProgress({ auditId, onAuditComplete, onCancel }) {
-  const [currentStage, setCurrentStage] = useState('validating');
+  const [currentStage, setCurrentStage] = useState('fetch');
   const [progressPercent, setProgressPercent] = useState(10);
-  const [statusMessage, setStatusMessage] = useState('Initializing audit engine...');
+  const [statusMessage, setStatusMessage] = useState('Initializing audit engine pipeline...');
   const [logs, setLogs] = useState([]);
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const addLog = (msg) => {
-    const time = new Date().toLocaleTimeString();
-    setLogs((prev) => [...prev, `[${time}] ${msg}`].slice(-15));
-  };
-
   useEffect(() => {
     if (!auditId) return;
 
-    addLog(`Initiating live SSE stream for audit ID: ${auditId}`);
-    const eventSource = new EventSource(getProgressEventSourceUrl(auditId));
+    const sseUrl = getProgressEventSourceUrl(auditId);
+    const eventSource = new EventSource(sseUrl);
 
-    eventSource.onmessage = (event) => {
+    eventSource.addEventListener('progress', (e) => {
       try {
-        const data = JSON.parse(event.data);
-
-        if (data.error) {
-          setHasError(true);
-          setErrorMessage(data.error);
-          addLog(`Error: ${data.error}`);
-          eventSource.close();
-          return;
-        }
-
-        if (data.stage) {
-          setCurrentStage(data.stage);
-        }
-        if (data.percent !== undefined) {
-          setProgressPercent(data.percent);
-        }
+        const data = JSON.parse(e.data);
+        if (data.stage) setCurrentStage(data.stage);
+        if (data.progress !== undefined) setProgressPercent(data.progress);
         if (data.message) {
           setStatusMessage(data.message);
-          addLog(data.message);
+          setLogs((prev) => [...prev.slice(-15), `[${new Date().toLocaleTimeString()}] ${data.message}`]);
         }
-
-        if (data.stage === 'completed' || data.status === 'completed') {
-          addLog('Audit pipeline complete. Loading report...');
-          eventSource.close();
-          setTimeout(() => {
-            onAuditComplete(auditId);
-          }, 600);
-        } else if (data.stage === 'failed' || data.status === 'failed') {
-          setHasError(true);
-          setErrorMessage(data.message || 'Audit encountered an unrecoverable error');
-          eventSource.close();
-        }
-      } catch (e) {
-        console.error('SSE parse error:', e);
+      } catch (err) {
+        console.error('Failed to parse SSE progress:', err);
       }
-    };
+    });
 
-    eventSource.onerror = async () => {
+    eventSource.addEventListener('completed', (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        setProgressPercent(100);
+        setStatusMessage('Audit inspection complete. Redirecting to report...');
+        setTimeout(() => {
+          eventSource.close();
+          onAuditComplete(data.auditId || auditId);
+        }, 600);
+      } catch (err) {
+        console.error('Failed to parse SSE completion:', err);
+        eventSource.close();
+        onAuditComplete(auditId);
+      }
+    });
+
+    eventSource.addEventListener('failed', (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        setHasError(true);
+        setErrorMessage(data.error || 'Audit encountered an unexpected engine failure.');
+        setStatusMessage('Audit failed.');
+      } catch {
+        setHasError(true);
+        setErrorMessage('Audit encountered an unexpected failure.');
+      }
       eventSource.close();
-      const pollInterval = setInterval(async () => {
+    });
+
+    eventSource.onerror = (err) => {
+      console.warn('SSE connection closed or lost:', err);
+      eventSource.close();
+      const interval = setInterval(async () => {
         try {
-          const audit = await fetchAuditById(auditId);
-          if (audit.status === 'completed') {
-            clearInterval(pollInterval);
-            onAuditComplete(auditId);
-          } else if (audit.status === 'failed') {
-            clearInterval(pollInterval);
-            setHasError(true);
-            setErrorMessage(audit.errorMessage || 'Audit failed');
-          } else {
-            setCurrentStage(audit.currentStage || 'in_progress');
-            setProgressPercent(audit.progressPercent || 50);
+          const res = await fetch(`/api/audits/${auditId}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.status === 'completed') {
+              clearInterval(interval);
+              onAuditComplete(auditId);
+            } else if (data.status === 'failed') {
+              clearInterval(interval);
+              setHasError(true);
+              setErrorMessage(data.error || 'Audit processing failed.');
+            }
           }
         } catch {
-          // ignore transient poll failure
+          // Keep polling
         }
       }, 2500);
 
-      return () => clearInterval(pollInterval);
+      return () => clearInterval(interval);
     };
 
     return () => {
@@ -118,7 +105,7 @@ export default function AuditProgress({ auditId, onAuditComplete, onCancel }) {
       {/* Header Banner */}
       <div className="text-center space-y-2">
         <div className="inline-flex items-center gap-1.5 text-xs text-text-tertiary font-mono">
-          <Loader2 className="w-3.5 h-3.5 animate-spin text-accent" />
+          <Loader2 className="w-3.5 h-3.5 animate-spin text-text-primary" />
           <span>INSPECTION IN PROGRESS</span>
         </div>
 
@@ -139,7 +126,7 @@ export default function AuditProgress({ auditId, onAuditComplete, onCancel }) {
 
         <div className="w-full h-1.5 bg-app-raised rounded-full overflow-hidden">
           <div
-            className="h-full bg-accent rounded-full transition-all duration-300"
+            className="h-full bg-text-primary rounded-full transition-all duration-300"
             style={{ width: `${Math.max(5, progressPercent)}%` }}
           />
         </div>
@@ -162,7 +149,7 @@ export default function AuditProgress({ auditId, onAuditComplete, onCancel }) {
                 key={stage.id}
                 className={`p-2.5 rounded-md border text-xs transition-colors flex items-center gap-2 ${
                   isCurrent
-                    ? 'border-accent bg-app-raised text-text-primary'
+                    ? 'border-text-primary bg-app-raised text-text-primary'
                     : isCompleted
                     ? 'border-app-border bg-app-surface text-text-secondary'
                     : 'border-app-border/40 bg-app-bg text-text-tertiary'
@@ -170,7 +157,7 @@ export default function AuditProgress({ auditId, onAuditComplete, onCancel }) {
               >
                 <div className="flex-shrink-0">
                   {isCurrent ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin text-accent" />
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-text-primary" />
                   ) : isCompleted ? (
                     <CheckCircle2 className="w-3.5 h-3.5 text-status-success" />
                   ) : (
@@ -193,7 +180,7 @@ export default function AuditProgress({ auditId, onAuditComplete, onCancel }) {
       <div className="surface-card border border-app-border overflow-hidden">
         <div className="bg-app-raised px-3.5 py-2 border-b border-app-border flex items-center justify-between text-xs font-mono text-text-tertiary">
           <div className="flex items-center gap-1.5">
-            <Terminal className="w-3.5 h-3.5 text-accent" />
+            <Terminal className="w-3.5 h-3.5 text-text-secondary" />
             <span>Audit Event Log</span>
           </div>
           <span className="text-[10px] text-status-success font-mono">
@@ -201,7 +188,7 @@ export default function AuditProgress({ auditId, onAuditComplete, onCancel }) {
           </span>
         </div>
 
-        <div className="p-3 bg-[#0A0C0E] font-mono text-[11px] space-y-1 max-h-40 overflow-y-auto">
+        <div className="p-3 bg-[#131516] font-mono text-[11px] space-y-1 max-h-40 overflow-y-auto">
           {logs.map((log, i) => (
             <div key={i} className="text-text-secondary">
               <span className="text-text-tertiary select-none mr-2">›</span>

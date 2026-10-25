@@ -10,8 +10,8 @@ export default function Navbar({ currentView, setCurrentView, onNewAuditClick })
           onClick={() => setCurrentView('landing')}
           className="flex items-center gap-2.5 cursor-pointer group select-none"
         >
-          <div className="w-7 h-7 rounded-md bg-app-surface border border-app-border flex items-center justify-center text-accent group-hover:border-app-border-hover transition-colors">
-            <ShieldCheck className="w-4 h-4 text-accent" />
+          <div className="w-7 h-7 rounded-md bg-app-surface border border-app-border flex items-center justify-center text-text-primary group-hover:border-app-border-hover transition-colors">
+            <ShieldCheck className="w-4 h-4 text-text-primary" />
           </div>
           <div className="flex items-center gap-2">
             <span className="font-semibold text-sm tracking-tight text-text-primary">
@@ -55,7 +55,7 @@ export default function Navbar({ currentView, setCurrentView, onNewAuditClick })
           {currentView !== 'landing' && currentView !== 'progress' && (
             <button
               onClick={onNewAuditClick}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-accent hover:bg-accent-hover text-white text-xs font-medium transition-colors shadow-subtle"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-[#E6E8E6] hover:bg-white text-[#17191B] text-xs font-medium transition-colors shadow-subtle"
             >
               <Plus className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">New Audit</span>

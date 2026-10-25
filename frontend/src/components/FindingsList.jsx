@@ -201,7 +201,7 @@ export default function FindingsList({
               <span
                 className={`px-1 py-0.2 rounded text-[10px] font-mono ${
                   selectedCategory === cat.id
-                    ? 'text-accent font-medium'
+                    ? 'text-text-primary font-medium'
                     : 'text-text-tertiary'
                 }`}
               >
@@ -219,7 +219,7 @@ export default function FindingsList({
             placeholder="Search findings or selectors..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-app-raised border border-app-border rounded-md pl-8 pr-3 py-1.5 text-xs text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent transition-colors font-mono"
+            className="w-full bg-app-raised border border-app-border rounded-md pl-8 pr-3 py-1.5 text-xs text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-text-primary transition-colors font-mono"
           />
           {searchQuery && (
             <button
@@ -334,7 +334,7 @@ export default function FindingsList({
 
                   <div className="flex items-center gap-2 flex-shrink-0 text-text-tertiary">
                     {currentAiFix && (
-                      <span className="text-[10px] font-mono text-accent hidden sm:inline-block">
+                      <span className="text-[10px] font-mono text-text-secondary hidden sm:inline-block">
                         AI fix ready
                       </span>
                     )}
@@ -360,14 +360,14 @@ export default function FindingsList({
                       <div className="rounded-md bg-app-raised border border-app-border p-3 space-y-1.5">
                         <div className="flex items-center justify-between text-[11px] font-mono text-text-tertiary">
                           <span className="flex items-center gap-1">
-                            <Code2 className="w-3.5 h-3.5 text-accent" />
+                            <Code2 className="w-3.5 h-3.5 text-text-primary" />
                             Detected Evidence
                           </span>
                           {finding.selector && (
                             <span className="text-text-secondary">{finding.selector}</span>
                           )}
                         </div>
-                        <pre className="font-mono text-[11px] text-text-primary overflow-x-auto whitespace-pre-wrap p-2 rounded bg-[#0A0C0E] border border-app-border">
+                        <pre className="font-mono text-[11px] text-text-primary overflow-x-auto whitespace-pre-wrap p-2 rounded bg-[#131516] border border-app-border">
                           {finding.evidence}
                         </pre>
                       </div>
@@ -390,17 +390,17 @@ export default function FindingsList({
                           >
                             {isAiLoading ? (
                               <>
-                                <Loader2 className="w-3 h-3 animate-spin text-accent" />
+                                <Loader2 className="w-3 h-3 animate-spin text-text-primary" />
                                 <span>Generating...</span>
                               </>
                             ) : currentAiFix ? (
                               <>
-                                <Sparkles className="w-3 h-3 text-accent" />
+                                <Sparkles className="w-3 h-3 text-text-primary" />
                                 <span>Re-generate AI Fix</span>
                               </>
                             ) : (
                               <>
-                                <Bot className="w-3 h-3 text-accent" />
+                                <Bot className="w-3 h-3 text-text-primary" />
                                 <span>AI Code Fix</span>
                               </>
                             )}
@@ -414,9 +414,9 @@ export default function FindingsList({
 
                       {/* Display Generated AI Code Fix */}
                       {currentAiFix && (
-                        <div className="mt-2.5 p-3 rounded-md bg-[#0A0C0E] border border-app-border space-y-2">
+                        <div className="mt-2.5 p-3 rounded-md bg-[#131516] border border-app-border space-y-2">
                           <div className="flex items-center justify-between text-[11px] font-mono text-text-secondary pb-1.5 border-b border-app-border">
-                            <span className="flex items-center gap-1.5 text-accent">
+                            <span className="flex items-center gap-1.5 text-text-primary font-medium">
                               <Sparkles className="w-3 h-3" />
                               Gemini Solution ({currentAiFix.language || 'html'})
                             </span>

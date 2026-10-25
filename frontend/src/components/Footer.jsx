@@ -8,8 +8,8 @@ export default function Footer() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           {/* Brand & info */}
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded bg-app-surface border border-app-border flex items-center justify-center text-accent">
-              <ShieldCheck className="w-3 h-3 text-accent" />
+            <div className="w-5 h-5 rounded bg-app-surface border border-app-border flex items-center justify-center text-text-primary">
+              <ShieldCheck className="w-3 h-3 text-text-primary" />
             </div>
             <span className="font-medium text-text-secondary text-xs">
               SiteSentry

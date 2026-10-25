@@ -5,101 +5,97 @@
 @layer base {
   html {
     color-scheme: dark;
-    background-color: #0D0F12;
+    background-color: #17191B;
   }
 
   body {
-    background-color: #0D0F12;
-    color: #F1F3F5;
+    background-color: #17191B;
+    color: #E6E8E6;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
-    letter-spacing: -0.011em;
+    letter-spacing: -0.01em;
   }
 
-  /* Refined, quiet scrollbar */
+  /* Quiet, restrained scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #0D0F12;
+    background: #17191B;
   }
   ::-webkit-scrollbar-thumb {
-    background: #23272E;
+    background: #25282B;
     border-radius: 3px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #2E343D;
+    background: #35393A;
   }
 
-  /* Clear, restrained focus ring for keyboard navigation */
+  /* Accessible neutral focus indicator - no purple glow */
   *:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px #0D0F12, 0 0 0 4px #8175F5;
+    box-shadow: 0 0 0 2px #17191B, 0 0 0 4px #777E79;
   }
 }
 
 @layer components {
-  /* Clean minimalist card surface */
+  /* Clean engineering card surfaces */
   .surface-card {
-    background-color: #14171B;
-    border: 1px solid #292E35;
-    border-radius: 10px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    background-color: #202325;
+    border: 1px solid #35393A;
+    border-radius: 8px;
   }
 
   .surface-card-hover {
-    background-color: #14171B;
-    border: 1px solid #292E35;
-    border-radius: 10px;
-    transition: background-color 180ms ease, border-color 180ms ease;
+    background-color: #202325;
+    border: 1px solid #35393A;
+    border-radius: 8px;
+    transition: background-color 150ms ease, border-color 150ms ease;
   }
   .surface-card-hover:hover {
-    background-color: #171B20;
-    border-color: #383F49;
+    background-color: #25282B;
+    border-color: #484E50;
   }
 
   .surface-raised {
-    background-color: #191D22;
-    border: 1px solid #292E35;
-    border-radius: 10px;
+    background-color: #25282B;
+    border: 1px solid #35393A;
+    border-radius: 8px;
   }
 
-  /* Refined button styles */
+  /* Restrained, professional buttons */
   .btn-primary {
-    background-color: #8175F5;
-    color: #FFFFFF;
+    background-color: #E6E8E6;
+    color: #17191B;
     font-weight: 500;
-    transition: background-color 150ms ease, transform 100ms ease;
+    transition: background-color 140ms ease;
   }
   .btn-primary:hover {
-    background-color: #7063E8;
-  }
-  .btn-primary:active {
-    transform: translateY(1px);
+    background-color: #FFFFFF;
   }
 
   .btn-secondary {
-    background-color: #191D22;
-    border: 1px solid #292E35;
-    color: #F1F3F5;
+    background-color: #25282B;
+    border: 1px solid #35393A;
+    color: #E6E8E6;
     font-weight: 500;
-    transition: background-color 150ms ease, border-color 150ms ease;
+    transition: background-color 140ms ease, border-color 140ms ease;
   }
   .btn-secondary:hover {
-    background-color: #20252B;
-    border-color: #383F49;
+    background-color: #2A2E31;
+    border-color: #484E50;
   }
 
   .btn-ghost {
-    color: #969EAA;
-    transition: color 150ms ease, background-color 150ms ease;
+    color: #A0A6A2;
+    transition: color 140ms ease, background-color 140ms ease;
   }
   .btn-ghost:hover {
-    color: #F1F3F5;
-    background-color: #191D22;
+    color: #E6E8E6;
+    background-color: #25282B;
   }
 }
 

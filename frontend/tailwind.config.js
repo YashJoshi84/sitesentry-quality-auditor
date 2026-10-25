@@ -8,40 +8,42 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Linear / Vercel inspired minimalist dark palette
+        // Professional engineering developer tool palette (neutral dark theme)
         app: {
-          bg: '#0D0F12',
-          surface: '#14171B',
-          raised: '#191D22',
-          overlay: '#20252B',
-          border: '#292E35',
-          'border-hover': '#383F49',
-          'border-active': '#454C58',
+          bg: '#17191B',
+          surface: '#202325',
+          raised: '#25282B',
+          overlay: '#2A2E31',
+          border: '#35393A',
+          'border-hover': '#484E50',
+          'border-active': '#5A6265',
         },
         text: {
-          primary: '#F1F3F5',
-          secondary: '#969EAA',
-          tertiary: '#656D7A',
+          primary: '#E6E8E6',
+          secondary: '#A0A6A2',
+          tertiary: '#777E79',
+          muted: '#777E79',
         },
+        // Neutral monochrome accent (removes generic purple)
         accent: {
-          DEFAULT: '#8175F5',
-          hover: '#7063E8',
-          muted: 'rgba(129, 117, 245, 0.12)',
-          border: 'rgba(129, 117, 245, 0.35)',
+          DEFAULT: '#E6E8E6',
+          hover: '#FFFFFF',
+          muted: 'rgba(230, 232, 230, 0.08)',
+          border: '#35393A',
         },
         status: {
-          success: '#34D399',
-          'success-bg': 'rgba(52, 211, 153, 0.10)',
-          'success-border': 'rgba(52, 211, 153, 0.22)',
-          warning: '#FBBF24',
-          'warning-bg': 'rgba(251, 191, 36, 0.10)',
-          'warning-border': 'rgba(251, 191, 36, 0.22)',
-          error: '#F87171',
-          'error-bg': 'rgba(248, 113, 113, 0.10)',
-          'error-border': 'rgba(248, 113, 113, 0.22)',
-          info: '#60A5FA',
-          'info-bg': 'rgba(96, 165, 250, 0.10)',
-          'info-border': 'rgba(96, 165, 250, 0.22)',
+          success: '#48C78E',
+          'success-bg': 'rgba(72, 199, 142, 0.10)',
+          'success-border': 'rgba(72, 199, 142, 0.25)',
+          warning: '#E5B84B',
+          'warning-bg': 'rgba(229, 184, 75, 0.10)',
+          'warning-border': 'rgba(229, 184, 75, 0.25)',
+          error: '#F16B68',
+          'error-bg': 'rgba(241, 107, 104, 0.10)',
+          'error-border': 'rgba(241, 107, 104, 0.25)',
+          info: '#7E97A6',
+          'info-bg': 'rgba(126, 151, 166, 0.10)',
+          'info-border': 'rgba(126, 151, 166, 0.25)',
         }
       },
       fontFamily: {
@@ -49,15 +51,15 @@ export default {
         mono: ['JetBrains Mono', 'Fira Code', 'ui-monospace', 'monospace'],
       },
       borderRadius: {
-        'card': '10px',
+        'card': '8px',
         'subtle': '6px',
       },
       boxShadow: {
-        'subtle': '0 1px 2px rgba(0, 0, 0, 0.25)',
-        'elevated': '0 4px 12px rgba(0, 0, 0, 0.35)',
+        'subtle': '0 1px 2px rgba(0, 0, 0, 0.35)',
+        'elevated': '0 4px 16px rgba(0, 0, 0, 0.45)',
       },
       transitionDuration: {
-        'default': '180ms',
+        'default': '150ms',
       }
     },
   },

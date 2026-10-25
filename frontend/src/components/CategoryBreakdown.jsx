@@ -48,8 +48,7 @@ export default function CategoryBreakdown({ scores, summary, findings = [], onSe
   ];
 
   const getScoreStyle = (score) => {
-    if (score >= 90) return 'text-status-success border-status-success-border bg-status-success-bg';
-    if (score >= 75) return 'text-accent border-accent-border bg-accent-muted';
+    if (score >= 80) return 'text-status-success border-status-success-border bg-status-success-bg';
     if (score >= 60) return 'text-status-warning border-status-warning-border bg-status-warning-bg';
     return 'text-status-error border-status-error-border bg-status-error-bg';
   };
@@ -68,7 +67,7 @@ export default function CategoryBreakdown({ scores, summary, findings = [], onSe
             onClick={() => onSelectCategory(isSelected ? 'all' : cat.key)}
             className={`cursor-pointer rounded-lg p-4 border transition-colors select-none flex flex-col justify-between ${
               isSelected
-                ? 'border-accent bg-app-raised shadow-subtle'
+                ? 'border-text-primary bg-app-raised shadow-subtle'
                 : 'bg-app-surface border-app-border hover:border-app-border-hover'
             }`}
           >
@@ -76,8 +75,8 @@ export default function CategoryBreakdown({ scores, summary, findings = [], onSe
               {/* Header */}
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 rounded bg-app-raised border border-app-border text-text-secondary">
-                    <Icon className="w-3.5 h-3.5 text-accent" />
+                  <div className="p-1.5 rounded bg-app-raised border border-app-border text-text-primary">
+                    <Icon className="w-3.5 h-3.5 text-text-primary" />
                   </div>
                   <div>
                     <h3 className="font-medium text-text-primary text-xs">{cat.title}</h3>
@@ -114,7 +113,7 @@ export default function CategoryBreakdown({ scores, summary, findings = [], onSe
                 </span>
               </div>
 
-              <span className={`flex items-center gap-1 font-sans text-[11px] transition-colors ${isSelected ? 'text-accent font-medium' : 'text-text-tertiary'}`}>
+              <span className={`flex items-center gap-1 font-sans text-[11px] transition-colors ${isSelected ? 'text-text-primary font-medium' : 'text-text-tertiary'}`}>
                 {isSelected ? 'Filtered' : 'Filter'}
                 <ArrowRight className="w-3 h-3" />
               </span>

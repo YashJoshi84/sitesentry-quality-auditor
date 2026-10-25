@@ -87,7 +87,7 @@ export default function ReportView({
   if (loading) {
     return (
       <div className="max-w-5xl mx-auto px-4 py-24 text-center">
-        <div className="w-8 h-8 rounded-md bg-app-surface border border-app-border flex items-center justify-center mx-auto mb-3 animate-spin text-accent">
+        <div className="w-8 h-8 rounded-md bg-app-surface border border-app-border flex items-center justify-center mx-auto mb-3 animate-spin text-text-primary">
           <RotateCw className="w-4 h-4" />
         </div>
         <h2 className="text-sm font-medium text-text-primary">Loading Audit Report</h2>
@@ -144,7 +144,7 @@ export default function ReportView({
             onClick={() => onReAudit(audit.url)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-app-surface hover:bg-app-raised border border-app-border hover:border-app-border-hover text-text-secondary hover:text-text-primary text-xs font-medium transition-colors"
           >
-            <RotateCw className="w-3.5 h-3.5 text-accent" />
+            <RotateCw className="w-3.5 h-3.5 text-text-primary" />
             <span>Re-Audit</span>
           </button>
 
@@ -153,7 +153,7 @@ export default function ReportView({
             download
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-app-surface hover:bg-app-raised border border-app-border hover:border-app-border-hover text-text-secondary hover:text-text-primary text-xs font-medium transition-colors"
           >
-            <FileJson className="w-3.5 h-3.5 text-accent" />
+            <FileJson className="w-3.5 h-3.5 text-text-primary" />
             <span>JSON</span>
           </a>
 
@@ -199,7 +199,7 @@ export default function ReportView({
                   href={audit.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="font-mono text-xs text-accent hover:underline flex items-center gap-1 truncate max-w-md"
+                  className="font-mono text-xs text-text-primary hover:underline hover:text-white flex items-center gap-1 truncate max-w-md"
                 >
                   <span className="truncate">{audit.url}</span>
                   <ExternalLink className="w-3 h-3 flex-shrink-0" />
@@ -288,7 +288,7 @@ export default function ReportView({
       <div className="surface-card p-5 border border-app-border space-y-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-app-border">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-md bg-app-raised border border-app-border flex items-center justify-center text-accent">
+            <div className="w-7 h-7 rounded-md bg-app-raised border border-app-border flex items-center justify-center text-text-primary">
               <Sparkles className="w-3.5 h-3.5" />
             </div>
             <div>
@@ -318,12 +318,12 @@ export default function ReportView({
             >
               {aiLoading ? (
                 <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin text-accent" />
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-text-primary" />
                   <span>Synthesizing...</span>
                 </>
               ) : (
                 <>
-                  <Bot className="w-3.5 h-3.5 text-accent" />
+                  <Bot className="w-3.5 h-3.5 text-text-primary" />
                   <span>Generate Brief</span>
                 </>
               )}
@@ -343,7 +343,7 @@ export default function ReportView({
           <div className="space-y-3.5 text-xs">
             {/* Plain English Summary */}
             <div className="p-3.5 rounded-md bg-app-raised border border-app-border text-text-secondary leading-relaxed font-normal">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-accent block mb-1">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-text-primary font-medium block mb-1">
                 Executive Synthesis
               </span>
               <p>{aiBrief.summary}</p>
@@ -392,7 +392,7 @@ export default function ReportView({
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Layers className="w-4 h-4 text-accent" />
+            <Layers className="w-4 h-4 text-text-primary" />
             <h2 className="text-xs font-semibold uppercase tracking-wider text-text-secondary font-mono">
               Category Breakdown
             </h2>

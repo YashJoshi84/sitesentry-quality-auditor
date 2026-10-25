@@ -3,8 +3,8 @@ import React from 'react';
 export function getScoreGrade(score) {
   if (score >= 95) return { grade: 'A+', label: 'Exceptional', color: 'emerald' };
   if (score >= 90) return { grade: 'A', label: 'Excellent', color: 'emerald' };
-  if (score >= 80) return { grade: 'B', label: 'Good Quality', color: 'indigo' };
-  if (score >= 65) return { grade: 'C', label: 'Needs Polish', color: 'amber' };
+  if (score >= 75) return { grade: 'B', label: 'Good Quality', color: 'emerald' };
+  if (score >= 60) return { grade: 'C', label: 'Needs Polish', color: 'amber' };
   return { grade: 'F', label: 'Critical Issues', color: 'rose' };
 }
 
@@ -18,30 +18,29 @@ export default function ScoreGauge({ score = 0, size = 150, strokeWidth = 8, tit
 
   const colorConfig = {
     emerald: {
-      stroke: '#34D399',
+      stroke: '#48C78E',
       textColor: 'text-status-success',
       badgeBg: 'bg-status-success-bg text-status-success border-status-success-border',
-      ringColor: '#1A2226',
-    },
-    indigo: {
-      stroke: '#8175F5',
-      textColor: 'text-accent',
-      badgeBg: 'bg-accent-muted text-accent border-accent-border',
-      ringColor: '#1B1C28',
+      ringColor: '#25282B',
     },
     amber: {
-      stroke: '#FBBF24',
+      stroke: '#E5B84B',
       textColor: 'text-status-warning',
       badgeBg: 'bg-status-warning-bg text-status-warning border-status-warning-border',
-      ringColor: '#24211A',
+      ringColor: '#25282B',
     },
     rose: {
-      stroke: '#F87171',
+      stroke: '#F16B68',
       textColor: 'text-status-error',
       badgeBg: 'bg-status-error-bg text-status-error border-status-error-border',
-      ringColor: '#261B1E',
+      ringColor: '#25282B',
     },
-  }[color];
+  }[color] || {
+    stroke: '#48C78E',
+    textColor: 'text-status-success',
+    badgeBg: 'bg-status-success-bg text-status-success border-status-success-border',
+    ringColor: '#25282B',
+  };
 
   return (
     <div className="flex flex-col items-center justify-center p-5 rounded-lg bg-app-surface border border-app-border">
