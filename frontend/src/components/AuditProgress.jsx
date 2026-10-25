@@ -12,7 +12,7 @@ import {
   AlertCircle,
   ArrowLeft,
 } from 'lucide-react';
-import { fetchAuditById } from '../services/api';
+import { fetchAuditById, getProgressEventSourceUrl } from '../services/api';
 
 const STAGES = [
   { id: 'validating', label: 'URL Validation', icon: Globe },
@@ -41,7 +41,7 @@ export default function AuditProgress({ auditId, onAuditComplete, onCancel }) {
     if (!auditId) return;
 
     addLog(`Initiating live SSE stream for audit ID: ${auditId}`);
-    const eventSource = new EventSource(`/api/audits/${auditId}/progress`);
+    const eventSource = new EventSource(getProgressEventSourceUrl(auditId));
 
     eventSource.onmessage = (event) => {
       try {

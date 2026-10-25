@@ -8,12 +8,14 @@ export async function connectDB() {
 
   if (uri) {
     try {
-      console.log(`[Database] Connecting to configured MongoDB: ${uri}`);
+      const sanitizedUri = uri.replace(/\/\/([^:]+):([^@]+)@/, '//$1:***@');
+      console.log(`[Database] Connecting to configured MongoDB: ${sanitizedUri}`);
       await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
       console.log('✅ [Database] Connected to external MongoDB successfully.');
       return;
     } catch (err) {
-      console.warn('⚠️ [Database] External MongoDB connection failed, falling back to embedded memory instance...', err.message);
+      console.error('❌ [Database] Configured MongoDB (MONGODB_URI) connection failed:', err.message);
+      console.warn('⚠️ [Database] Falling back to embedded MongoMemoryServer...');
     }
   }
 

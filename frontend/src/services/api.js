@@ -1,8 +1,24 @@
 /**
  * SiteSentry API Client Service
+ * Dynamically resolves the API base URL:
+ * - If VITE_API_URL is configured (e.g. on Vercel pointing to Render), uses the remote backend.
+ * - If unset (local development), defaults to relative '/api' which Vite proxies to localhost:5001.
  */
 
-const API_BASE = '/api';
+function resolveApiBase() {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (!envUrl) {
+    return '/api';
+  }
+  const cleanUrl = envUrl.trim().replace(/\/+$/, '');
+  return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
+}
+
+export const API_BASE = resolveApiBase();
+
+export function getProgressEventSourceUrl(auditId) {
+  return `${API_BASE}/audits/${auditId}/progress`;
+}
 
 export async function startAudit(url) {
   const response = await fetch(`${API_BASE}/audits`, {
