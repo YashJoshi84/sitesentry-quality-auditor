@@ -1,0 +1,23 @@
+{
+  "name": "sitesentry-backend",
+  "version": "1.0.0",
+  "description": "SiteSentry Backend - Automated Website Quality Auditor Engine",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "dependencies": {
+    "@axe-core/playwright": "^4.10.1",
+    "@google/genai": "^2.31.0",
+    "axe-core": "^4.10.2",
+    "cheerio": "^1.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongodb-memory-server": "^10.1.4",
+    "mongoose": "^8.9.5",
+    "playwright": "^1.49.1"
+  }
+}
