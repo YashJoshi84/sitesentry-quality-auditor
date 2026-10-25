@@ -72,23 +72,33 @@ export async function streamAuditProgress(req, res) {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache, no-transform');
   res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
   res.flushHeaders?.();
+
+  const writeSSE = (data, event = null) => {
+    if (event) {
+      res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+    }
+    res.write(`data: ${JSON.stringify(data)}\n\n`);
+  };
 
   // Send initial state immediately
   try {
     const audit = await Audit.findById(id);
     if (!audit) {
-      res.write(`data: ${JSON.stringify({ error: 'Audit not found' })}\n\n`);
+      writeSSE({ error: 'Audit not found' }, 'failed');
       return res.end();
     }
 
-    res.write(`data: ${JSON.stringify({
+    const initialState = {
       auditId: audit._id,
       stage: audit.currentStage,
       percent: audit.progressPercent,
       status: audit.status,
       message: audit.errorMessage || `Current stage: ${audit.currentStage}`,
-    })}\n\n`);
+    };
+
+    writeSSE(initialState, audit.status === 'completed' ? 'completed' : 'progress');
 
     if (audit.status === 'completed' || audit.status === 'failed') {
       return res.end();
@@ -99,7 +109,8 @@ export async function streamAuditProgress(req, res) {
 
   // Listener for dynamic updates
   const listener = (data) => {
-    res.write(`data: ${JSON.stringify(data)}\n\n`);
+    const eventName = data.stage === 'completed' ? 'completed' : data.stage === 'failed' ? 'failed' : 'progress';
+    writeSSE(data, eventName);
     if (data.stage === 'completed' || data.stage === 'failed') {
       auditProgressEmitter.off(`progress:${id}`, listener);
       res.end();

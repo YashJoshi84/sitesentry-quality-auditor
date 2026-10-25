@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Loader2, CheckCircle2, AlertCircle, ArrowLeft, Terminal, Search, Accessibility, Link2, Smartphone } from 'lucide-react';
-import { getProgressEventSourceUrl } from '../services/api';
+import { getProgressEventSourceUrl, fetchAuditById } from '../services/api';
 
 const STAGES = [
   { id: 'fetch', label: 'Page Fetch & Render', icon: Search },
@@ -11,6 +11,24 @@ const STAGES = [
   { id: 'scoring', label: 'Score Aggregation', icon: CheckCircle2 },
 ];
 
+const STAGE_MAP = {
+  queued: 'fetch',
+  validating: 'fetch',
+  fetching_html: 'fetch',
+  fetch: 'fetch',
+  seo_audit: 'seo',
+  seo: 'seo',
+  a11y_audit: 'a11y',
+  a11y: 'a11y',
+  link_audit: 'links',
+  links: 'links',
+  mobile_audit: 'mobile',
+  mobile: 'mobile',
+  finalizing: 'scoring',
+  scoring: 'scoring',
+  completed: 'scoring',
+};
+
 export default function AuditProgress({ auditId, onAuditComplete, onCancel }) {
   const [currentStage, setCurrentStage] = useState('fetch');
   const [progressPercent, setProgressPercent] = useState(10);
@@ -18,83 +36,119 @@ export default function AuditProgress({ auditId, onAuditComplete, onCancel }) {
   const [logs, setLogs] = useState([]);
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const completedRef = useRef(false);
 
   useEffect(() => {
     if (!auditId) return;
 
-    const sseUrl = getProgressEventSourceUrl(auditId);
-    const eventSource = new EventSource(sseUrl);
+    let pollInterval = null;
+    let eventSource = null;
 
-    eventSource.addEventListener('progress', (e) => {
-      try {
-        const data = JSON.parse(e.data);
-        if (data.stage) setCurrentStage(data.stage);
-        if (data.progress !== undefined) setProgressPercent(data.progress);
-        if (data.message) {
-          setStatusMessage(data.message);
-          setLogs((prev) => [...prev.slice(-15), `[${new Date().toLocaleTimeString()}] ${data.message}`]);
-        }
-      } catch (err) {
-        console.error('Failed to parse SSE progress:', err);
+    const handleProgressData = (data) => {
+      if (!data || completedRef.current) return;
+
+      const stageKey = data.stage || data.currentStage;
+      if (stageKey && STAGE_MAP[stageKey]) {
+        setCurrentStage(STAGE_MAP[stageKey]);
       }
-    });
 
-    eventSource.addEventListener('completed', (e) => {
-      try {
-        const data = JSON.parse(e.data);
+      const percent = data.progress ?? data.percent ?? data.progressPercent;
+      if (percent !== undefined) {
+        setProgressPercent((prev) => Math.max(prev, percent));
+      }
+
+      const msg = data.message || data.statusMessage;
+      if (msg) {
+        setStatusMessage(msg);
+        setLogs((prev) => [...prev.slice(-15), `[${new Date().toLocaleTimeString()}] ${msg}`]);
+      }
+
+      const status = data.status || (stageKey === 'completed' ? 'completed' : stageKey === 'failed' ? 'failed' : null);
+
+      if (status === 'completed' || percent === 100) {
+        completedRef.current = true;
         setProgressPercent(100);
         setStatusMessage('Audit inspection complete. Redirecting to report...');
+        if (pollInterval) clearInterval(pollInterval);
+        if (eventSource) eventSource.close();
         setTimeout(() => {
-          eventSource.close();
-          onAuditComplete(data.auditId || auditId);
-        }, 600);
-      } catch (err) {
-        console.error('Failed to parse SSE completion:', err);
-        eventSource.close();
-        onAuditComplete(auditId);
-      }
-    });
-
-    eventSource.addEventListener('failed', (e) => {
-      try {
-        const data = JSON.parse(e.data);
+          onAuditComplete(data.auditId || data._id || auditId);
+        }, 400);
+      } else if (status === 'failed') {
+        completedRef.current = true;
         setHasError(true);
-        setErrorMessage(data.error || 'Audit encountered an unexpected engine failure.');
+        setErrorMessage(data.error || data.errorMessage || 'Audit encountered an unexpected failure.');
         setStatusMessage('Audit failed.');
-      } catch {
-        setHasError(true);
-        setErrorMessage('Audit encountered an unexpected failure.');
+        if (pollInterval) clearInterval(pollInterval);
+        if (eventSource) eventSource.close();
       }
-      eventSource.close();
-    });
-
-    eventSource.onerror = (err) => {
-      console.warn('SSE connection closed or lost:', err);
-      eventSource.close();
-      const interval = setInterval(async () => {
-        try {
-          const res = await fetch(`/api/audits/${auditId}`);
-          if (res.ok) {
-            const data = await res.json();
-            if (data.status === 'completed') {
-              clearInterval(interval);
-              onAuditComplete(auditId);
-            } else if (data.status === 'failed') {
-              clearInterval(interval);
-              setHasError(true);
-              setErrorMessage(data.error || 'Audit processing failed.');
-            }
-          }
-        } catch {
-          // Keep polling
-        }
-      }, 2500);
-
-      return () => clearInterval(interval);
     };
 
+    // 1. Establish SSE EventSource connection
+    try {
+      const sseUrl = getProgressEventSourceUrl(auditId);
+      eventSource = new EventSource(sseUrl);
+
+      eventSource.onmessage = (e) => {
+        try {
+          const data = JSON.parse(e.data);
+          handleProgressData(data);
+        } catch (err) {
+          console.warn('Failed to parse SSE message:', err);
+        }
+      };
+
+      eventSource.addEventListener('progress', (e) => {
+        try {
+          const data = JSON.parse(e.data);
+          handleProgressData(data);
+        } catch (err) {
+          console.warn('Failed to parse SSE progress:', err);
+        }
+      });
+
+      eventSource.addEventListener('completed', (e) => {
+        try {
+          const data = JSON.parse(e.data);
+          handleProgressData({ ...data, status: 'completed' });
+        } catch {
+          handleProgressData({ status: 'completed' });
+        }
+      });
+
+      eventSource.addEventListener('failed', (e) => {
+        try {
+          const data = JSON.parse(e.data);
+          handleProgressData({ ...data, status: 'failed' });
+        } catch {
+          handleProgressData({ status: 'failed' });
+        }
+      });
+
+      eventSource.onerror = (err) => {
+        console.warn('SSE stream disconnected or buffering:', err);
+      };
+    } catch (sseErr) {
+      console.warn('Could not initialize EventSource:', sseErr);
+    }
+
+    // 2. Active Fallback Polling via fetchAuditById
+    // Guaranteed to advance progress and complete even if proxies/free tiers buffer SSE
+    pollInterval = setInterval(async () => {
+      if (completedRef.current) return;
+      try {
+        const audit = await fetchAuditById(auditId);
+        if (audit) {
+          handleProgressData(audit);
+        }
+      } catch {
+        // Ignore transient poll errors while audit runs
+      }
+    }, 1200);
+
     return () => {
-      eventSource.close();
+      if (eventSource) eventSource.close();
+      if (pollInterval) clearInterval(pollInterval);
     };
   }, [auditId]);
 
@@ -184,7 +238,7 @@ export default function AuditProgress({ auditId, onAuditComplete, onCancel }) {
             <span>Audit Event Log</span>
           </div>
           <span className="text-[10px] text-status-success font-mono">
-            Connected (SSE)
+            Connected
           </span>
         </div>
 
