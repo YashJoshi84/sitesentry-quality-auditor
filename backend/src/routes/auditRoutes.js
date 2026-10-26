@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   createAudit,
+  cancelAudit,
   getAuditById,
   streamAuditProgress,
   listAudits,
@@ -10,12 +11,14 @@ import {
   generateAuditAiBrief,
   generateFindingAiFixController,
 } from '../controllers/auditController.js';
+import { auditTriggerLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
-router.post('/', createAudit);
+router.post('/', auditTriggerLimiter, createAudit);
 router.get('/', listAudits);
 router.get('/:id', getAuditById);
+router.post('/:id/cancel', cancelAudit);
 router.get('/:id/progress', streamAuditProgress);
 router.delete('/:id', deleteAudit);
 router.get('/:id/export/json', exportAuditJson);

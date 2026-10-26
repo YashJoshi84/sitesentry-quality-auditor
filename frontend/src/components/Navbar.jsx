@@ -3,7 +3,7 @@ import { ShieldCheck, History, Sparkles, Plus } from 'lucide-react';
 
 export default function Navbar({ currentView, setCurrentView, onNewAuditClick }) {
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-app-border bg-app-bg/95 backdrop-blur-md">
+    <header className="sticky top-0 z-40 w-full border-b border-app-border bg-app-bg">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
         {/* Brand */}
         <div 
@@ -34,7 +34,7 @@ export default function Navbar({ currentView, setCurrentView, onNewAuditClick })
                   : 'text-text-secondary hover:text-text-primary hover:bg-app-surface'
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5" />
+              <ShieldCheck className="w-3.5 h-3.5" />
               <span>Auditor</span>
             </button>
 

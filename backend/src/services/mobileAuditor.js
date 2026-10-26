@@ -1,5 +1,6 @@
 import * as cheerio from 'cheerio';
 import { chromium } from 'playwright';
+import { attachPlaywrightSsrfGuard } from './ssrfProtection.js';
 
 /**
  * Mobile Readiness Auditor
@@ -132,6 +133,9 @@ export async function auditMobileReadiness(targetUrl, html) {
     });
 
     const page = await context.newPage();
+    // Intercept and block any SSRF / private IP subresource requests
+    await attachPlaywrightSsrfGuard(page);
+
     await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 12000 });
 
     const overflowData = await page.evaluate(() => {
@@ -147,9 +151,9 @@ export async function auditMobileReadiness(targetUrl, html) {
         id: 'mobile-horizontal-overflow',
         category: 'mobile',
         severity: 'critical',
-        title: 'Horizontal layout overflow on mobile screens',
-        description: `Page content width (${overflowData.scrollW}px) exceeds the mobile screen viewport width (${overflowData.clientW}px), causing unwanted horizontal scroll.`,
-        evidence: `Scroll width: ${overflowData.scrollW}px vs Viewport: ${overflowData.clientW}px on a 375px display.`,
+        title: 'Horizontal layout overflow on 375px mobile viewport',
+        description: `Page content width (${overflowData.scrollW}px) exceeds the 375px mobile viewport width (${overflowData.clientW}px), causing unwanted horizontal scroll on small displays.`,
+        evidence: `Scroll width: ${overflowData.scrollW}px vs Viewport: ${overflowData.clientW}px on a 375px display simulation.`,
         selector: 'html, body',
         recommendation: 'Inspect elements that extend past the viewport boundary. Add max-width: 100% and overflow-x: hidden where appropriate.'
       });
@@ -158,20 +162,20 @@ export async function auditMobileReadiness(targetUrl, html) {
         id: 'mobile-overflow-passed',
         category: 'mobile',
         severity: 'passed',
-        title: 'Page fits cleanly within mobile viewport',
-        description: 'Verified on a 375px mobile device emulator: no unexpected horizontal scrollbar or content clipping.',
+        title: 'Page fits within tested 375px mobile viewport',
+        description: 'Verified on a 375px mobile device simulation: no horizontal scrollbar detected. (Note: this verifies standard mobile viewport behavior; multi-screen responsive verification across larger tablet/desktop breakpoints is recommended).',
         evidence: `Document width (${overflowData.scrollW}px) matches mobile viewport (${overflowData.clientW}px).`,
         selector: 'html',
         recommendation: 'No action needed.'
       });
     }
 
-    await browser.close();
   } catch (err) {
+    console.warn(`[Mobile Auditor] Mobile viewport emulation notice: ${err.message}`);
+  } finally {
     if (browser) {
       try { await browser.close(); } catch { /* ignore */ }
     }
-    console.warn(`[Mobile Auditor] Mobile viewport emulation notice: ${err.message}`);
   }
 
   return findings;

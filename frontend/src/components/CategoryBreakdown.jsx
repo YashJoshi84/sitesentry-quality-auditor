@@ -16,15 +16,15 @@ export default function CategoryBreakdown({ scores, summary, findings = [], onSe
     {
       key: 'seo',
       title: 'SEO & Metadata',
-      score: scores?.seo ?? 100,
+      score: scores?.seo ?? 0,
       icon: Search,
-      weight: '30% Weight',
+      weight: '25% Weight',
       desc: 'Title tags, meta descriptions, headings hierarchy, and canonical definitions.',
     },
     {
       key: 'accessibility',
       title: 'Axe Accessibility',
-      score: scores?.a11y ?? 100,
+      score: scores?.a11y ?? 0,
       icon: Accessibility,
       weight: '30% Weight',
       desc: 'WCAG 2.1 compliance, form labels, button text, and ARIA roles.',
@@ -32,7 +32,7 @@ export default function CategoryBreakdown({ scores, summary, findings = [], onSe
     {
       key: 'broken_links',
       title: 'Hyperlinks',
-      score: scores?.brokenLinks ?? 100,
+      score: scores?.brokenLinks ?? 0,
       icon: Link2,
       weight: '20% Weight',
       desc: 'Internal and external link health, HTTP status codes, and connectivity.',
@@ -40,9 +40,9 @@ export default function CategoryBreakdown({ scores, summary, findings = [], onSe
     {
       key: 'mobile',
       title: 'Mobile Readiness',
-      score: scores?.mobileReadiness ?? 100,
+      score: scores?.mobileReadiness ?? 0,
       icon: Smartphone,
-      weight: '20% Weight',
+      weight: '25% Weight',
       desc: 'Viewport configuration, layout overflow detection, and fluid indicators.',
     },
   ];

@@ -63,22 +63,22 @@ export default function AuditProgress({ auditId, onAuditComplete, onCancel }) {
         setLogs((prev) => [...prev.slice(-15), `[${new Date().toLocaleTimeString()}] ${msg}`]);
       }
 
-      const status = data.status || (stageKey === 'completed' ? 'completed' : stageKey === 'failed' ? 'failed' : null);
+      const status = data.status || (stageKey === 'completed' ? 'completed' : stageKey === 'partially_completed' ? 'partially_completed' : stageKey === 'cancelled' ? 'cancelled' : stageKey === 'failed' ? 'failed' : null);
 
-      if (status === 'completed' || percent === 100) {
+      if (status === 'completed' || status === 'partially_completed' || (percent === 100 && status !== 'failed' && status !== 'cancelled')) {
         completedRef.current = true;
         setProgressPercent(100);
-        setStatusMessage('Audit inspection complete. Redirecting to report...');
+        setStatusMessage(status === 'partially_completed' ? 'Audit finished with partial scan coverage. Redirecting to report...' : 'Audit inspection complete. Redirecting to report...');
         if (pollInterval) clearInterval(pollInterval);
         if (eventSource) eventSource.close();
         setTimeout(() => {
           onAuditComplete(data.auditId || data._id || auditId);
         }, 400);
-      } else if (status === 'failed') {
+      } else if (status === 'failed' || status === 'cancelled') {
         completedRef.current = true;
         setHasError(true);
-        setErrorMessage(data.error || data.errorMessage || 'Audit encountered an unexpected failure.');
-        setStatusMessage('Audit failed.');
+        setErrorMessage(data.error || data.errorMessage || (status === 'cancelled' ? 'Audit was cancelled by request.' : 'Audit encountered an unexpected failure.'));
+        setStatusMessage(status === 'cancelled' ? 'Audit cancelled.' : 'Audit failed.');
         if (pollInterval) clearInterval(pollInterval);
         if (eventSource) eventSource.close();
       }

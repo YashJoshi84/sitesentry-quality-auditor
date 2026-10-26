@@ -41,7 +41,7 @@ const auditSchema = new mongoose.Schema(
     domain: { type: String, required: true },
     status: {
       type: String,
-      enum: ['pending', 'in_progress', 'completed', 'failed'],
+      enum: ['pending', 'in_progress', 'running', 'completed', 'partially_completed', 'failed', 'cancelled'],
       default: 'pending',
       index: true,
     },
@@ -59,6 +59,10 @@ const auditSchema = new mongoose.Schema(
       a11y: { type: Number, default: 0 },
       brokenLinks: { type: Number, default: 0 },
       mobileReadiness: { type: Number, default: 0 },
+    },
+    categoryDetails: {
+      type: mongoose.Schema.Types.Mixed,
+      default: {},
     },
     summary: {
       passedCount: { type: Number, default: 0 },

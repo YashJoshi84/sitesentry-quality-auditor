@@ -1,20 +1,45 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { connectDB, disconnectDB } from './config/db.js';
+import { connectDB, disconnectDB, getDatabaseStatus } from './config/db.js';
 import auditRoutes from './routes/auditRoutes.js';
+import { generalApiLimiter } from './middleware/rateLimiter.js';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// Middleware
+// Standard Security Headers
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  next();
+});
+
+// CORS Configuration
+const allowedOrigins = process.env.CORS_ORIGIN 
+  ? process.env.CORS_ORIGIN.split(',').map(s => s.trim()) 
+  : ['*'];
+
 app.use(cors({
-  origin: '*',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Blocked by CORS policy'));
+    }
+  },
   methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
 }));
-app.use(express.json());
+
+// Body parsing with 100kb limit to mitigate large payload DoS
+app.use(express.json({ limit: '100kb' }));
+
+// Apply general rate limiting to API routes
+app.use('/api/', generalApiLimiter);
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -26,11 +51,18 @@ app.use((req, res, next) => {
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
+  const dbHealth = getDatabaseStatus();
   res.json({
     status: 'ok',
     service: 'SiteSentry Backend',
     timestamp: new Date().toISOString(),
     uptimeSeconds: Math.floor(process.uptime()),
+    database: {
+      connected: dbHealth.connected,
+      storageType: dbHealth.storageType,
+      isVolatile: dbHealth.isVolatile,
+      readyState: dbHealth.readyStateText,
+    },
   });
 });
 

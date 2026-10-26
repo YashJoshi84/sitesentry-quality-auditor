@@ -168,6 +168,19 @@ export default function ReportView({
         </div>
       </div>
 
+      {/* Partial Scan Notice Banner */}
+      {audit.status === 'partially_completed' && (
+        <div className="p-3.5 rounded-md bg-status-warning-bg border border-status-warning-border text-xs text-status-warning flex items-start gap-2.5">
+          <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+          <div className="space-y-0.5">
+            <p className="font-medium text-text-primary">Partial Scan Coverage</p>
+            <p className="text-text-secondary">
+              One or more audit categories could not complete due to target server restrictions or scanner timeouts. The reported score reflects verified checks only and does not award unearned points for incomplete sections.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Main Overview Banner */}
       <div className="surface-card p-6 border border-app-border">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">

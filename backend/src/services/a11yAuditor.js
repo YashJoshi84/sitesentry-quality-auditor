@@ -1,10 +1,11 @@
 import { chromium } from 'playwright';
 import AxeBuilder from '@axe-core/playwright';
 import * as cheerio from 'cheerio';
+import { attachPlaywrightSsrfGuard } from './ssrfProtection.js';
 
 /**
  * Accessibility Auditor using axe-core & Playwright
- * Includes high-resilience fallback if headless browser environment encounters issues.
+ * Includes SSRF subresource protection and static DOM fallback.
  */
 
 export async function auditAccessibility(targetUrl, html) {
@@ -21,10 +22,13 @@ export async function auditAccessibility(targetUrl, html) {
     const context = await browser.newContext({
       userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 SiteSentry-A11y/1.0',
       viewport: { width: 1280, height: 800 },
-      ignoreHTTPSErrors: true,
+      ignoreHTTPSErrors: false,
     });
 
     const page = await context.newPage();
+    // Intercept and block any SSRF / private IP subresource requests
+    await attachPlaywrightSsrfGuard(page);
+
     // Navigate with networkidle or load timeout
     await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
 
@@ -82,25 +86,24 @@ export async function auditAccessibility(targetUrl, html) {
         id: 'a11y-all-passed',
         category: 'accessibility',
         severity: 'passed',
-        title: 'Zero Axe-core WCAG Violations Detected',
-        description: 'The inspected webpage complies with standard WCAG 2.1 Level AA automated accessibility rules.',
-        evidence: `All ${axeResults.passes.length} evaluated rules passed with 0 violations.`,
+        title: 'Zero Axe-core Automated WCAG Violations Detected',
+        description: 'No automated violations were flagged by axe-core for WCAG 2.1 Level AA automated checks. Note: automated testing evaluates approximately 30–40% of WCAG success criteria; full conformance requires human evaluation of keyboard flows, focus management, and assistive technology.',
+        evidence: `All ${axeResults.passes.length} evaluated automated rules passed with 0 violations.`,
         selector: 'body',
-        recommendation: 'Continue regular accessibility testing including manual keyboard navigation and screen reader audits.'
+        recommendation: 'Complement automated scans with manual keyboard navigation testing and screen reader audits.'
       });
     }
 
-    await browser.close();
     return findings;
 
   } catch (browserError) {
     console.warn(`[A11y Auditor] Playwright/Axe-core run encountered issue: ${browserError.message}. Using high-precision static DOM accessibility scanner fallback.`);
+    // Fallback static DOM a11y engine using Cheerio
+    return runStaticA11yChecks(html);
+  } finally {
     if (browser) {
       try { await browser.close(); } catch { /* ignore */ }
     }
-
-    // Fallback static DOM a11y engine using Cheerio
-    return runStaticA11yChecks(html);
   }
 }
 

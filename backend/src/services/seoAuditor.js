@@ -5,7 +5,8 @@ import * as cheerio from 'cheerio';
  * Analyzes HTML via Cheerio for essential and advisory SEO factors.
  */
 export function auditSEO(html, targetUrl) {
-  const $ = cheerio.load(html);
+  const safeHtml = typeof html === 'string' ? html : '';
+  const $ = cheerio.load(safeHtml);
   const findings = [];
 
   // 1. Page Title Check
@@ -80,9 +81,9 @@ export function auditSEO(html, targetUrl) {
     findings.push({
       id: 'seo-meta-desc-missing',
       category: 'seo',
-      severity: 'critical',
+      severity: 'warning',
       title: 'Missing meta description tag',
-      description: 'No <meta name="description"> tag was found. Search engines use this to display summary snippets in search results.',
+      description: 'No <meta name="description"> tag was found. Search engines will generate an automatic snippet from body text.',
       evidence: 'No <meta name="description"> in <head>',
       selector: 'head',
       recommendation: 'Add a <meta name="description" content="..."> tag in your <head> summarizing the page content in 120–160 characters.'
@@ -91,7 +92,7 @@ export function auditSEO(html, targetUrl) {
     findings.push({
       id: 'seo-meta-desc-empty',
       category: 'seo',
-      severity: 'critical',
+      severity: 'warning',
       title: 'Empty meta description content',
       description: 'A <meta name="description"> tag is present, but its content attribute is blank.',
       evidence: '<meta name="description" content="" />',
