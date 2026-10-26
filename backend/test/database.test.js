@@ -5,11 +5,19 @@ import { sanitizeMongoUri, getDatabaseStatus } from '../src/config/db.js';
 
 describe('Database Configuration & Diagnostics', () => {
   it('sanitizeMongoUri masks credentials cleanly', () => {
-    const rawAtlas = 'mongodb+srv://admin_user:SuperSecretPassword123@cluster0.abcde.mongodb.net/sitesentry?retryWrites=true&w=majority';
-    const sanitized = sanitizeMongoUri(rawAtlas);
+    const testUser = 'test_fixture_user';
+    const testSecret = 'fixture_token_abc123';
+    const rawUri = `mongodb://${testUser}:${testSecret}@127.0.0.1:27017/test_db`;
+    const sanitized = sanitizeMongoUri(rawUri);
 
-    assert.equal(sanitized.includes('SuperSecretPassword123'), false);
-    assert.equal(sanitized, 'mongodb+srv://admin_user:***@cluster0.abcde.mongodb.net/sitesentry?retryWrites=true&w=majority');
+    assert.equal(sanitized.includes(testSecret), false);
+    assert.equal(sanitized, `mongodb://${testUser}:***@127.0.0.1:27017/test_db`);
+
+    // If MONGODB_URI is provided via environment, verify masking without exposing values
+    if (process.env.MONGODB_URI && process.env.MONGODB_URI.includes('@')) {
+      const sanitizedEnv = sanitizeMongoUri(process.env.MONGODB_URI);
+      assert.ok(sanitizedEnv.includes(':***@'));
+    }
   });
 
   it('sanitizeMongoUri handles URIs without credentials or null safely', () => {

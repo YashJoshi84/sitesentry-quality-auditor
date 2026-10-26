@@ -54,6 +54,13 @@
 - **Audit History**: All completed audits persist in MongoDB with search, score badges, timestamps, view details, and deletion capabilities.
 
 ---
+## 🎥 Project Demo
+
+Watch the demo video to see SiteSentry in action, including the website auditing workflow, category-wise quality scores, detailed findings, verified links, and audit history.
+
+**Demo Video:** [Watch SiteSentry Demo](https://drive.google.com/file/d/1UxskEyk6u5vG7hIf6Nn6Y9Ff1aCkwKtj/view?usp=sharing)
+
+*Note: The video demonstrates the application's interface and workflows through a screen recording.*
 
 ## 🛠️ Technology Stack
 
